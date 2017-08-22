@@ -22,22 +22,55 @@ First the data is generated, once we have the data, we can estimate the paramete
 
 In the first stage of my project I coded two models from Drovandi et al. using pBIL. Aftar calculating the likelihood of the auxiliary model, I used a Random Walk Metropolis-Hastings MCMC to sample from the target distribution. It resulted in [HamiltonianABC](https://github.com/tpapp/HamiltonianABC.jl/) (collaboration with Tamás K. Papp).
 
-**First model** \
-  * The true model is y ∼ Exponential(λ), IID, where λ is the scale. \
-  * The auxiliary model is y ∼ N(μ, σ²), with statistics ϕ = (μ, σ). \
+**First model** 
+  * The true model is y ∼ Exponential(λ), IID, where λ is the scale. 
+  * The auxiliary model is y ∼ N(μ, σ²), with statistics ϕ = (μ, σ). 
   * The prior is λ ∼ Uniform(A,B) prior. 
 
-This model and the estimation worked fine.
+This model and the estimation worked fine, but it is too simple to improve efficiency.
 
-**Second model** \
-  * The true model was the g-and-k quantile function described by Rayner and MacGillivray (2002). \
+**Second model** 
+  * The true model was the g-and-k quantile function described by Rayner and MacGillivray (2002). 
   * The auxiliary model was a three component normal mixture model. 
 
-We faced serious problems with this model. First of all, I coded the MLE of the finite component normal mixture model, but 
+We faced serious problems with this model. \
+First of all, I coded the MLE of the finite component normal mixture model, which computes the means, variances and weights of the normals given the observed data and the desired number of mixtures. 
+With the g-and-k quantile function, I experienced the so called "isolation", which means that one observation point is an outlier getting weight 1, the other observed points get weigth 0, which results in variance equal to 0. There are ways to disentangle the problem of isolation, but the parameters of interests still did not converge to the true values. There is work to be done with this model.
+
+Afterwards, we turned to two economic-related models:
+* Stochastic volatility model
+* Simultaneous equations
+
+**Stochastic volatility** \
+  The discrete-time version of the Ornstein-Ulenbeck Stochastic - volatility model:
+  
+ yₜ = xₜ + ϵₜ where ϵₜ ∼ χ²(1)\
+    xₜ = ρ * xₜ₋₁ + σ * νₜ  where νₜ ∼ N(0, 1)
 
 
+ For the auxiliary model, we used two regressions. The first regression was an AR(2) process on the first differences, the second was also an AR(2) process on the original variables in order to capture the levels. I will go into more details later with this model. 
+ 
+**Simultaneous equations** \
+  True model:
 
+  Cₜ = β * Yₜ + uₜ where  uₜ ∼ N(0, τ)   (1)\
+  Yₜ = Cₜ + Xₜ                              (2)
 
+  * Cₜ is the consumption at time t 
+  * Xₜ is the non-consumption at time t
+  * Yₜ is the output at time t 
+  * Output is used for consumption and non-consumption 
+  * We have simultaneous equations as Cₜ depends on Yₜ 
+  * Also, Yₜ depends on Cₜ as well 
+  * Only Xₜ is exogenous in this model, Yₜ and Cₜ are endogenous 
+
+Auxiliary model: \
+I assumed that the consumption at time t is normally distributed as follows \
+       Cₜ ∼  N(β₁ + β₂ * Xₜ, √σ²)
+
+# Hamiltonian Monte Carlo 
+
+# Stochastic Volatility model
 
 
 
