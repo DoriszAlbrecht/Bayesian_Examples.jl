@@ -44,7 +44,7 @@ Afterwards, we turned to two economic-related models:
 **Stochastic volatility** \
   The discrete-time version of the Ornstein-Ulenbeck Stochastic - volatility model:
   
-    yₜ = xₜ + ϵₜ where ϵₜ ∼ χ²(1)\
+    yₜ = xₜ + ϵₜ where ϵₜ ∼ χ²(1)
     xₜ = ρ * xₜ₋₁ + σ * νₜ  where νₜ ∼ N(0, 1)
 
 
