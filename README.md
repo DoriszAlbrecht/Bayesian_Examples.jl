@@ -136,3 +136,6 @@ sample, tuned_sampler = NUTS_tune_and_mcmc(RNG, pp, 1000; q = θ₀)
 
 The following graphs show the results for the parameters:
 
+![rho_plot](https://user-images.githubusercontent.com/26724827/29598603-dd6d1ae2-8797-11e7-9837-5373c03c4ceb.png)
+
+
