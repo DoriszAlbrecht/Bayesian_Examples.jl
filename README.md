@@ -44,7 +44,7 @@ Afterwards, we turned to two economic-related models:
 **Stochastic volatility** \
   The discrete-time version of the Ornstein-Ulenbeck Stochastic - volatility model:
   
- yₜ = xₜ + ϵₜ where ϵₜ ∼ χ²(1)\
+    yₜ = xₜ + ϵₜ where ϵₜ ∼ χ²(1)\
     xₜ = ρ * xₜ₋₁ + σ * νₜ  where νₜ ∼ N(0, 1)
 
 
@@ -66,13 +66,73 @@ Afterwards, we turned to two economic-related models:
 
 Auxiliary model: \
 I assumed that the consumption at time t is normally distributed as follows \
-       Cₜ ∼  N(β₁ + β₂ * Xₜ, √σ²)
+       Cₜ ∼  N(β₁ + β₂ * Xₜ ; √σ²)
 
 # Hamiltonian Monte Carlo 
 
 # Stochastic Volatility model
 
+I will now introduce the required steps for the estimation of the parameters of interest in the stochastic volatility model with the Dynamic Hamiltonian Monte Carlo method. We need to import three functions from the DynamicHMC repository: _logdensity_, _loggradient_ and _length_. 
 
+* First we need to define a structure, which we will use in every imported function. This structure should contain the observed data, the priors and the shocks, but the components may vary depending on the estimated model. 
 
+```julia
+struct Volatility_Problem{T, Prior_ρ, Prior_σ}
+    "observed data"
+    ys::Vector{T}
+    "prior for ρ (persistence)"
+    prior_ρ::Prior_ρ
+    "prior for σ_v (volatility of volatility)"
+    prior_σ::Prior_σ
+    "χ^2 draws for simulation"
+    ϵ::Vector{T}
+    "Normal(0,1) draws for simulation"
+    ν::Vector{T}
+end
+```
+After specifying the data generating function and a couple of facilitator and additional functions for the particular model, we can define the logdensity(pp::Structure\_of\_Model, θ) where the first term is the previously defined sturture, that is unpacked inside of the function, θ is the vector of parameters. 
 
+```julia
+function logdensity(pp::Volatility_Problem, θ)
+    
+    @unpack ys, prior_ρ, prior_σ, ν, ϵ = pp
+    trans = transformation_to(pp)
+    ρ, σ = trans(θ)
+    logprior = logpdf(prior_ρ, ρ) + logpdf(prior_σ, σ)
+
+    # Generating zs, which is the latent volatility process
+    zs = simulate_stochastic(ρ, σ, ϵ, ν)
+    β₁, v₁ = OLS(yX1(zs, 2)...)
+    β₂, v₂ = OLS(yX2(zs, 2)...)
+    
+    # first differences
+    y₁, X₁ = yX1(ys, 2)
+    log_likelihood1 = sum(logpdf.(Normal(0, √v₁), y₁ - X₁ * β₁))
+
+    # levels
+    y₂, X₂ = yX2(ys, 2)
+    log_likelihood2 = sum(logpdf.(Normal(0, √v₂), y₂ - X₂ * β₂))
+    # likelihood
+    logprior + log_likelihood1 + log_likelihood2 + logjac(trans, θ)
+
+end
+```
+The next step is to define the loggradient(pp::Structure\_of\_Model, x) function. I used the ForwardDiff.jl package and its forward mode automatic differentiation method. The ForwardDiff.gradient gives back ∇logdensity evaluated at x. 
+
+```julia
+loggradient(pp::Volatility_Problem, x) =
+    ForwardDiff.gradient(y->logdensity(pp, y), x)::Vector{Float64}
+```
+Finally, with the imported _length_ function, we have to specify the length of the parameters of interest. 
+```julia
+Base.length(::Volatility_Problem) = 2
+```
+Given the defined functions, we can now sample the parameters: 
+
+```julia
+const RNG = srand(UInt32[0x23ef614d, 0x8332e05c, 0x3c574111, 0x121aa2f4])
+sample, tuned_sampler = NUTS_tune_and_mcmc(RNG, pp, 1000; q = θ₀)
+```
+
+The following graphs show the results for the parameters:
 
