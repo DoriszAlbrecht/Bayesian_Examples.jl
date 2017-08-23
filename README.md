@@ -139,3 +139,5 @@ The following graphs show the results for the parameters:
 ![rho_plot](https://user-images.githubusercontent.com/26724827/29598603-dd6d1ae2-8797-11e7-9837-5373c03c4ceb.png)
 
 
+![sigma_plot](https://user-images.githubusercontent.com/26724827/29598635-0e84b9aa-8798-11e7-9218-bc62347407ae.png)
+
