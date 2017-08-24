@@ -1,9 +1,11 @@
+
 # Bayesian_Examples.jl
 Examples of my project for Google Summer of Code
 
 # Literature Overview
   * Betancourt, M. (2017). A Conceptual Introduction to Hamiltonian Monte Carlo.
   * Drovandi, C. C., Pettitt, A. N., & Lee, A. (2015). Bayesian indirect inference using a parametric auxiliary model. 
+  * A. Ronald GALLANT and Robert E. MCCULLOCH (2009). On the Determination of General Scientific Models With Application to Asset Pricing
   * Rayner, G. D. and MacGillivray, H. L. (2002). Numerical maximum likelihood estimation for the g-and-k and generalized g-and-h distributions. Stat. Comput. 12 57–75.
 
 # GSOC 2017 project: Bayesian estimation using Random Walk Metropolis-Hastings and Dynamic Hamiltonian Monte Carlo methods
@@ -16,11 +18,18 @@ Hopefully, by the end of this post, I will manage to introduce these methods a l
 
 # Parametric Bayesian Indirect Likelihood for the Full Data
 
-Usually when we face an intractable likelihood or a likelihood that would be extremly costly to calculate, we have the option to use an alternative auxiliary model to extract and estimate the parameters of interest. These alternative models should be easier to deal with. Drovandi et al. revises a collection of parametric Bayesian Indirect Inference (pBII) methods, I focused on the parametric Bayesian Indirect Likelihood for the Full Data (pdBIL) method proposed by Gallant and McCulloch (2009). The pdBIL uses the likelihood of the auxiliary model as a substitute for the intractable likelihood. The pdBIL does not compare summary statistics, instead works in the following way: 
+Usually when we face an intractable likelihood or a likelihood that would be extremely costly to calculate, we have the option to use an alternative auxiliary model to extract and estimate the parameters of interest. These alternative models should be easier to deal with. Drovandi et al. revises a collection of parametric Bayesian Indirect Inference (pBII) methods, I focused on the parametric Bayesian Indirect Likelihood for the Full Data (pdBIL) method proposed by Gallant and McCulloch (2009). The pdBIL uses the likelihood of the auxiliary model as a substitute for the intractable likelihood. The pdBIL does not compare summary statistics, instead works in the following way: 
 
 First the data is generated, once we have the data, we can estimate the parameters of the auxiliary model. Then, the estimated parameters are put into the auxiliary likelihood with the observed/generated data. Afterwards we can use this likelihood in our chosen Bayesian method i.e. MCMC. 
 
-In the first stage of my project I coded two models from Drovandi et al. using pBIL. Aftar calculating the likelihood of the auxiliary model, I used a Random Walk Metropolis-Hastings MCMC to sample from the target distribution. It resulted in [HamiltonianABC](https://github.com/tpapp/HamiltonianABC.jl/) (collaboration with Tamás K. Papp).
+To summarize the method, first we have the parameter vector θ and the observed data y. We would like to calculate the likelihood of p(θ|y), but it is intractable or costly to compute. In this case, with pdBIL we have to find an auxiliary model (A) that we use to approximate the true likelihood in the following way: 
+First we have to generate points, denote with **x** from the data generating function with the previously proposed parameters θ. Then we compute the MLE of the auxiliary likelihood under **x** to get the parameters denoted by ϕ. Under these parameters ϕ, we can now compute the likelihood of pₐ(y|ϕ). It is desirable to have the auxiliary likelihood as close to the true likelihood as possible. 
+
+# First stage of my project
+
+In the first stage of my project I coded two models from Drovandi et al. using pdBIL. After calculating the likelihood of the auxiliary model, I used a Random Walk Metropolis-Hastings MCMC to sample from the target distribution [Toy models](https://github.com/tpapp/HamiltonianABC.jl/tree/dorisz-toy-models). In this stage of the project, the methods I used were well-known.
+The purpose of the replication of the toy models from Drovandi et al. was to find out what issues we might face later with this method and to come up with a usable interface. 
+This stage resulted in [HamiltonianABC](https://github.com/tpapp/HamiltonianABC.jl/) (collaboration with Tamás K. Papp).
 
 **First model** 
   * The true model is y ∼ Exponential(λ), IID, where λ is the scale. 
