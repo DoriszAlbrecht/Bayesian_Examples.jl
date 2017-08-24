@@ -14,11 +14,14 @@ Under the mentorship of Tamás K. Papp, I completed a major revision of Bayesian
 
 Hopefully, by the end of this post, I will manage to introduce these methods a little bit better and more extensively.
 
-# Bayesian Indirect Inference Using a Parametric Auxiliary Model
+# Parametric Bayesian Indirect Likelihood for the Full Data
 
-Facing an intractable model, we have the option to use an alternative auxiliary model to extract and estimate the parameters of interest. These alternative models should be easier to deal with. Drovandi et al. introduced a collection of parametric Bayesian Indirect Inference (pBII) methods, I focused on the parametric Bayesian Inidrect Likelihood (pBIL) method. The pBIL uses the likelihood of the auxiliary model as a substitute for the intractable likelihood. The pBIL does not compare summary statistics, instead works in the following way: 
+Facing an intractable model, we have the option to use an alternative auxiliary model to extract and estimate the parameters of interest. These alternative models should be easier to deal with. Drovandi et al. revises a collection of parametric Bayesian Indirect Inference (pBII) methods, I focused on the parametric Bayesian Indirect Likelihood for the Full Data (pdBIL) method proposed by Gallant and McCulloch (2009). The pdBIL uses the likelihood of the auxiliary model as a substitute for the intractable likelihood. The pdBIL does not compare summary statistics, instead works in the following way: 
 
 First the data is generated, once we have the data, we can estimate the parameters of the auxiliary model. Then, the estimated parameters are put into the auxiliary likelihood with the observed/generated data. Afterwards we can use this likelihood in our chosen Bayesian method i.e. MCMC. 
+
+More specifically, one 
+
 
 In the first stage of my project I coded two models from Drovandi et al. using pBIL. Aftar calculating the likelihood of the auxiliary model, I used a Random Walk Metropolis-Hastings MCMC to sample from the target distribution. It resulted in [HamiltonianABC](https://github.com/tpapp/HamiltonianABC.jl/) (collaboration with Tamás K. Papp).
 
