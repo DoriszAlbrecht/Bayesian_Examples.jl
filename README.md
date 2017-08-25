@@ -28,58 +28,24 @@ First we have to generate points, denote with **x** from the data generating fun
 # First stage of my project
 
 In the first stage of my project I coded two models from Drovandi et al. using pdBIL. After calculating the likelihood of the auxiliary model, I used a Random Walk Metropolis-Hastings MCMC to sample from the target distribution [Toy models](https://github.com/tpapp/HamiltonianABC.jl/tree/dorisz-toy-models). In this stage of the project, the methods I used were well-known.
-The purpose of the replication of the toy models from Drovandi et al. was to find out what issues we might face later with this method and to come up with a usable interface. 
+The purpose of the replication of the toy models from Drovandi et al. was to find out what issues we might face later and to come up with a usable interface. 
 This stage resulted in [HamiltonianABC](https://github.com/tpapp/HamiltonianABC.jl/) (collaboration with Tamás K. Papp).
 
-**First model** 
-  * The true model is y ∼ Exponential(λ), IID, where λ is the scale. 
-  * The auxiliary model is y ∼ N(μ, σ²), with statistics ϕ = (μ, σ). 
-  * The prior is λ ∼ Uniform(A,B) prior. 
+# Second stage of my project
 
-This model and the estimation worked fine, but it is too simple to improve efficiency.
+After the first stage, I revised Betancourt (2017) and did a code revision for Tamás K. Papp's [DynamicHMC.jl](https://github.com/tpapp/DynamicHMC.jl) which consisted of checking the code and its comparison with the paper. In addition to using the Hamiltonian Monte Carlo method, the usage of the forward mode automatic differentiation of the ForwardDiff package was the other main factor of this stage.
+The novelty of this project was to find a way to fit every component together in a way to get an efficient estimation out of it.
 
-**Second model** 
-  * The true model was the g-and-k quantile function described by Rayner and MacGillivray (2002). 
-  * The auxiliary model was a three component normal mixture model. 
+# Stochastic Volatility model
 
-We faced serious problems with this model. \
-First of all, I coded the MLE of the finite component normal mixture model, which computes the means, variances and weights of the normals given the observed data and the desired number of mixtures. 
-With the g-and-k quantile function, I experienced the so called "isolation", which means that one observation point is an outlier getting weight 1, the other observed points get weigth 0, which results in variance equal to 0. There are ways to disentangle the problem of isolation, but the parameters of interests still did not converge to the true values. There is work to be done with this model.
 
-Afterwards, we turned to two economic-related models:
-* Stochastic volatility model
-* Simultaneous equations
+The discrete-time version of the Ornstein-Ulenbeck Stochastic - volatility model:
 
-**Stochastic volatility** \
-  The discrete-time version of the Ornstein-Ulenbeck Stochastic - volatility model:
-  
     yₜ = xₜ + ϵₜ where ϵₜ ∼ χ²(1)
     xₜ = ρ * xₜ₋₁ + σ * νₜ  where νₜ ∼ N(0, 1)
 
+For the auxiliary model, we used two regressions. The first regression was an AR(2) process on the first differences, the second was also an AR(2) process on the original variables in order to capture the levels. I will go into more details with this model.
 
- For the auxiliary model, we used two regressions. The first regression was an AR(2) process on the first differences, the second was also an AR(2) process on the original variables in order to capture the levels. I will go into more details later with this model. 
- 
-**Simultaneous equations** \
-  True model:
-
-  Cₜ = β * Yₜ + uₜ where  uₜ ∼ N(0, τ)   (1)\
-  Yₜ = Cₜ + Xₜ                              (2)
-
-  * Cₜ is the consumption at time t 
-  * Xₜ is the non-consumption at time t
-  * Yₜ is the output at time t 
-  * Output is used for consumption and non-consumption 
-  * We have simultaneous equations as Cₜ depends on Yₜ 
-  * Also, Yₜ depends on Cₜ as well 
-  * Only Xₜ is exogenous in this model, Yₜ and Cₜ are endogenous 
-
-Auxiliary model: \
-I assumed that the consumption at time t is normally distributed as follows \
-       Cₜ ∼  N(β₁ + β₂ * Xₜ ; √σ²)
-
-# Hamiltonian Monte Carlo 
-
-# Stochastic Volatility model
 
 I will now introduce the required steps for the estimation of the parameters of interest in the stochastic volatility model with the Dynamic Hamiltonian Monte Carlo method. We need to import three functions from the DynamicHMC repository: _logdensity_, _loggradient_ and _length_. 
 
@@ -150,6 +116,69 @@ The following graphs show the results for the parameters:
 
 ![sigma_plot](https://user-images.githubusercontent.com/26724827/29598635-0e84b9aa-8798-11e7-9218-bc62347407ae.png)
 
+# Problems that I have faced during GSOC
+
+1) Isolation.
+
+  * The true model was the g-and-k quantile function described by Rayner and MacGillivray (2002). 
+  * The auxiliary model was a three component normal mixture model. 
+
+We faced serious problems with this model. \
+First of all, I coded the MLE of the finite component normal mixture model, which computes the means, variances and weights of the normals given the observed data and the desired number of mixtures. 
+With the g-and-k quantile function, I experienced the so called "isolation", which means that one observation point is an outlier getting weight 1, the other observed points get weigth 0, which results in variance equal to 0. There are ways to disentangle the problem of isolation, but the parameters of interests still did not converge to the true values. There is work to be done with this model.
+
+2) Type-stability issues.
+  
+  
+
+
+
+
+# Cut/Get rid of this chunk
+
+**First model** 
+  * The true model is y ∼ Exponential(λ), IID, where λ is the scale. 
+  * The auxiliary model is y ∼ N(μ, σ²), with statistics ϕ = (μ, σ). 
+  * The prior is λ ∼ Uniform(A,B) prior. 
+
+This model and the estimation worked fine, but it is too simple to improve efficiency.
+
+**Second model** 
+  * The true model was the g-and-k quantile function described by Rayner and MacGillivray (2002). 
+  * The auxiliary model was a three component normal mixture model. 
+
+We faced serious problems with this model. \
+First of all, I coded the MLE of the finite component normal mixture model, which computes the means, variances and weights of the normals given the observed data and the desired number of mixtures. 
+With the g-and-k quantile function, I experienced the so called "isolation", which means that one observation point is an outlier getting weight 1, the other observed points get weigth 0, which results in variance equal to 0. There are ways to disentangle the problem of isolation, but the parameters of interests still did not converge to the true values. There is work to be done with this model.
+
+Afterwards, we turned to two economic-related models:
+* Stochastic volatility model
+* Simultaneous equations
+
+
+ 
+**Simultaneous equations** \
+  True model:
+
+  Cₜ = β * Yₜ + uₜ where  uₜ ∼ N(0, τ)   (1)\
+  Yₜ = Cₜ + Xₜ                              (2)
+
+  * Cₜ is the consumption at time t 
+  * Xₜ is the non-consumption at time t
+  * Yₜ is the output at time t 
+  * Output is used for consumption and non-consumption 
+  * We have simultaneous equations as Cₜ depends on Yₜ 
+  * Also, Yₜ depends on Cₜ as well 
+  * Only Xₜ is exogenous in this model, Yₜ and Cₜ are endogenous 
+
+Auxiliary model: \
+I assumed that the consumption at time t is normally distributed as follows \
+       Cₜ ∼  N(β₁ + β₂ * Xₜ ; √σ²)
+
+# Hamiltonian Monte Carlo 
+
+
+    
 # Problems that I have faced during GSOC
 
 # Future improvements
