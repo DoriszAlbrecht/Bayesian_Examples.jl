@@ -5,7 +5,7 @@ Examples of my project for Google Summer of Code
 # Literature Overview
   * Betancourt, M. (2017). A Conceptual Introduction to Hamiltonian Monte Carlo.
   * Drovandi, C. C., Pettitt, A. N., & Lee, A. (2015). Bayesian indirect inference using a parametric auxiliary model. 
-  * A. Ronald GALLANT and Robert E. MCCULLOCH (2009). On the Determination of General Scientific Models With Application to Asset Pricing
+  * Gallant, A. R. and McCulloch, R. E. (2009). On the Determination of General Scientific Models With Application to Asset Pricing
   * Rayner, G. D. and MacGillivray, H. L. (2002). Numerical maximum likelihood estimation for the g-and-k and generalized g-and-h distributions. Stat. Comput. 12 57–75.
 
 # GSOC 2017 project: Bayesian estimation using Random Walk Metropolis-Hastings and Dynamic Hamiltonian Monte Carlo methods
@@ -129,8 +129,33 @@ With the g-and-k quantile function, I experienced the so called "isolation", whi
 
 2) Type-stability issues.
   
+  To use the automatic differentiation method efficiently, I had to code the functions to be type-stable, otherwise the sampling functions would have taken hours to run. See the following example:
   
-
+  * This is not type-stable
+  ```julia
+  function simulate_stochastic(ρ, σ, ϵs, νs)
+    N = length(ϵs)
+    @argcheck N == length(νs) 
+    xs = Vector(N)
+    for i in 1:N
+        xs[i] = (i == 1) ? νs[1]*σ*(1 - ρ^2)^(-0.5) : (ρ*xs[i-1] + σ*νs[i])
+    end
+    xs + log.(ϵs) + 1.27
+end
+  ```
+* This is type-stable
+```julia
+function simulate_stochastic(ρ, σ, ϵs, νs)
+    N = length(ϵs)
+    @argcheck N == length(νs)
+    x₀ = νs[1]*σ*(1 - ρ^2)^(-0.5)
+    xs = Vector{typeof(x₀)}(N)
+    for i in 1:N
+        xs[i] = (i == 1) ? x₀ : (ρ*xs[i-1] + σ*νs[i])
+    end
+    xs + log.(ϵs) + 1.27
+end
+```
 
 
 
