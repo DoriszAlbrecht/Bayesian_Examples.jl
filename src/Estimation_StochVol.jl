@@ -1,7 +1,9 @@
 using DynamicHMC
 using DiffWrappers
 using ContinuousTransformations
-using StochasticVolatility
+include(Pkg.dir("Bayesian_Examples", "src", "StochasticVolatility.jl"))
+using StochasticVolatilities
+
 import Distributions: Uniform, InverseGamma
 using JLD
 
@@ -12,7 +14,7 @@ RNG = Base.Random.GLOBAL_RNG
 y = simulate_stochastic(ρ, σ, 10000)
 
 # set up the model
-model = StochasticVolatility(StochasticVolatility(y, Uniform(-1, 1), InverseGamma(1, 1), 10000)...)
+model = StochasticVolatility(y, Uniform(-1, 1), InverseGamma(1, 1), 10000)
 
 # we start the estimation process from the true values
 θ₀ = inverse(model.transformation, (ρ, σ))

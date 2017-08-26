@@ -1,4 +1,4 @@
-module StochasticVolatility
+module StochasticVolatilities
 
 using ArgCheck
 using Distributions
@@ -8,10 +8,9 @@ using StatsBase
 using Base.Test
 using ContinuousTransformations
 
-
-export StochasticVolatility
-
-
+export
+    StochasticVolatility,
+    simulate_stochastic
 
 """
     simulate_stochastic(ρ, σ_v, ϵs, νs)
@@ -99,7 +98,6 @@ end
 Convenience constructor for StochasticVolatility.
 Take in the observed data, the priors, and number of simulations (M).
 """
-
 function StochasticVolatility(ys, prior_ρ, prior_σ, M)
     transformation = TransformationTuple((ℝto(prior_ρ), (ℝto(prior_σ))))
     StochasticVolatility(ys, prior_ρ, prior_σ, rand(Chisq(1), M), randn(M), transformation)
@@ -136,7 +134,6 @@ end
 `parts...` appended to the directory containing `src/` etc. Useful for saving graphs and data.
 
 """
-
 path(parts...) = normpath(joinpath(splitdir(Base.find_in_path("StochasticVolatility"))[1], "..", parts...))
 
 end
