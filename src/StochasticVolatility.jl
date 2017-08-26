@@ -5,15 +5,12 @@ using Distributions
 using Parameters
 using DynamicHMC
 using StatsBase
-using StatPlots
 using Base.Test
-using ForwardDiff
-using Plots
 using ContinuousTransformations
-import ForwardDiff: Dual
-using DiffWrappers
+
+
 export StochasticVolatility
-plotlyjs()
+
 
 
 """
@@ -93,24 +90,19 @@ function yX2(zs, K)
 end
 
 "Constructor which calculates cached values and buffers. Use this unless you know what you are doing."
-
-bridge_trans(dist::Uniform) = bridge(ℝ, Segment(dist.a, dist.b))
-bridge_trans(dist::InverseGamma) = bridge(ℝ, ℝ⁺)
-
+ℝto(dist::Uniform) = transformation_to(Segment(minimum(dist), maximum(dist)), LOGISTIC)
+ℝto(::InverseGamma) = transformation_to(ℝ⁺)
 
 """
-    Toy_Vol_Problem(ys, prior_ρ, prior_σ, M)
+    StochasticVolatility(ys, prior_ρ, prior_σ, M)
 
-Convenience constructor for Toy_Vol_Problem.
+Convenience constructor for StochasticVolatility.
 Take in the observed data, the priors, and number of simulations (M).
 """
-function StochasticVolatility(ys, prior_ρ, prior_σ, M)
-    StochasticVolatility(ys, prior_ρ, prior_σ, rand(Chisq(1), M), randn(M))
-end
 
-function StochasticVolatility(ys, prior_ρ, prior_σ, ϵ, ν)
-    transformation = TransformationTuple((bridge_trans(prior_ρ), (bridge_trans(prior_σ))))
-    StochasticVolatility(ys, prior_ρ, prior_σ, ϵ, ν, transformation)
+function StochasticVolatility(ys, prior_ρ, prior_σ, M)
+    transformation = TransformationTuple((ℝto(prior_ρ), (ℝto(prior_σ))))
+    StochasticVolatility(ys, prior_ρ, prior_σ, rand(Chisq(1), M), randn(M), transformation)
 end
 
 
@@ -141,7 +133,7 @@ end
 
     path(parts...)
 
-`parts...` appended to the directory containing `src/` etc. Useful for saving graphs and data. *NOT EXPORTED*.
+`parts...` appended to the directory containing `src/` etc. Useful for saving graphs and data.
 
 """
 
