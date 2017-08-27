@@ -19,8 +19,8 @@ Take in the parameter values (ρ, σ) for the latent volatility process, the err
 
 The discrete-time version of the Ornstein-Ulenbeck Stochastic - volatility model:
 
-    y_t = x_t + ϵ_t where ϵ_t ∼ χ^2(1)
-    x_t = ρ * x_(t-1) + σ * ν_t  where ν_t ∼ N(0, 1)
+    yₜ = xₜ + ϵₜ where ϵₜ ∼ χ^2(1)
+    xₜ = ρ * xₜ₋₁ + σ * νₜ  where νₜ ∼ N(0, 1)
 
 """
 function simulate_stochastic(ρ, σ, ϵs, νs)

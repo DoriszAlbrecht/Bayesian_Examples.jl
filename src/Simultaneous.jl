@@ -66,8 +66,6 @@ struct Simultaneous{T, Prior_β, Dist_x, Dist_us, Ttrans}
     transformation::Ttrans
 end
 
-ℝto(dist::Uniform) = transformation_to(Segment(minimum(dist), maximum(dist)), LOGISTIC)
-
 """
     Simultaneous(Cs, Ys, prior_β, dist_x, dist_us, M)
 
@@ -75,7 +73,7 @@ Convenience constructor for ToySimultaneousModel.
 Take in the observed data, the prior, and number of simulations (M).
 """
 function Simultaneous(Cs, Ys, prior_β, dist_x, dist_us, M)
-    transformation = (ℝto(prior_β))
+    transformation = transformation_to(Segment(minimum(prior_β), maximum(prior_β)), LOGISTIC) 
     Simultaneous(Cs, Ys, rand(dist_x, M), dist_x, prior_β, rand(dist_us, M), dist_us, transformation)
 end
 

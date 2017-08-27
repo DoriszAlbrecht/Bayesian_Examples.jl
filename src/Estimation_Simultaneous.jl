@@ -3,7 +3,7 @@ using DiffWrappers
 using ContinuousTransformations
 include(Pkg.dir("Bayesian_Examples", "src", "Simultaneous.jl"))
 using SimultaneousModel
-
+using Distributions
 import Distributions: Uniform
 using JLD
 
