@@ -75,7 +75,7 @@ Convenience constructor for ToySimultaneousModel.
 Take in the observed data, the prior, and number of simulations (M).
 """
 function Simultaneous(Cs, Ys, prior_β, dist_x, dist_us, M)
-    transformation = TransformationTuple((ℝto(prior_β)))
+    transformation = (ℝto(prior_β))
     Simultaneous(Cs, Ys, rand(dist_x, M), dist_x, prior_β, rand(dist_us, M), dist_us, transformation)
 end
 
