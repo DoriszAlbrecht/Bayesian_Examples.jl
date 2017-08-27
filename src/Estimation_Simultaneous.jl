@@ -16,8 +16,7 @@ C, Y = simulate_simultaneous(β, rand(Normal(100, 3), 100), rand(Normal(0, 5), 1
 model = Simultaneous(C, Y, Uniform(0, 1), Normal(100, 3), Normal(0, 5), 1000)
 
 # we start the estimation process from the true values
-θ₀ = inverse(model.transformation, β)
-
+θ₀ = inverse(model.transformation, (β,))
 
 # wrap for gradient calculations
 

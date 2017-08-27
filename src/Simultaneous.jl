@@ -73,8 +73,11 @@ Convenience constructor for ToySimultaneousModel.
 Take in the observed data, the prior, and number of simulations (M).
 """
 function Simultaneous(Cs, Ys, prior_β, dist_x, dist_us, M)
-    transformation = transformation_to(Segment(minimum(prior_β), maximum(prior_β)), LOGISTIC) 
-    Simultaneous(Cs, Ys, rand(dist_x, M), dist_x, prior_β, rand(dist_us, M), dist_us, transformation)
+    βtrans = transformation_to(Segment(minimum(prior_β), maximum(prior_β)),
+                               LOGISTIC)
+    transformation = TransformationTuple((βtrans,))
+    Simultaneous(Cs, Ys, rand(dist_x, M), dist_x, prior_β, rand(dist_us, M),
+                 dist_us, transformation)
 end
 
 
@@ -84,7 +87,7 @@ end
 
 function (pp::Simultaneous)(θ)
     @unpack Cs, Ys, Xs, prior_β, us, transformation = pp
-    β = transformation(θ)
+    β, = transformation(θ)
     logprior = logpdf(prior_β, β)
     Ones = ones(length(us))
     ## Generating the data
