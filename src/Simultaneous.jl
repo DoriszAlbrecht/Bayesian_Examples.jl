@@ -94,10 +94,10 @@ function (pp::Simultaneous)(θ)
     C, Y = simulate_simultaneous(β, Xs, us)
     # OLS estimatation, regressing C on [1 X]
     XX = hcat(Ones, Y-C)
-    est, σ² = qrfact(XX, Val{true}) \ C
-
+    est = qrfact(XX, Val{true}) \ C
+    σ² =  mean(abs2,  C - XX*est)
     log_likelihood = sum(logpdf.(Normal(0, √σ²), Cs - [ones(length(Cs)) Ys-Cs] * est))
-    return(logprior + log_likelihood)
+    return(logprior + log_likelihood + logjac(transformation, θ)) 
 end
 
 

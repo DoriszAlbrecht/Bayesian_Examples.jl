@@ -124,7 +124,7 @@ function (pp::StochasticVolatility)(θ)
     log_likelihood1 = sum(logpdf.(Normal(0, √v₁), y₁ - X₁ * β₁))
     y₂, X₂ = yX2(ys, 2)
     log_likelihood2 = sum(logpdf.(Normal(0, √v₂), y₂ - X₂ * β₂))
-    logprior + log_likelihood1 + log_likelihood2
+    logprior + log_likelihood1 + log_likelihood2 + logjac(transformation, θ)
 end
 
 """
