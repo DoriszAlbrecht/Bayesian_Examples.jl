@@ -1,4 +1,3 @@
-
 # Bayesian_Examples.jl
 Examples of my project for Google Summer of Code
 
@@ -22,13 +21,17 @@ Usually when we face an intractable likelihood or a likelihood that would be ext
 
 First the data is generated, once we have the data, we can estimate the parameters of the auxiliary model. Then, the estimated parameters are put into the auxiliary likelihood with the observed/generated data. Afterwards we can use this likelihood in our chosen Bayesian method i.e. MCMC. 
 
-To summarize the method, first we have the parameter vector θ and the observed data y. We would like to calculate the likelihood of p(θ|y), but it is intractable or costly to compute. In this case, with pdBIL we have to find an auxiliary model (A) that we use to approximate the true likelihood in the following way: 
-First we have to generate points, denote with **x** from the data generating function with the previously proposed parameters θ. Then we compute the MLE of the auxiliary likelihood under **x** to get the parameters denoted by ϕ. Under these parameters ϕ, we can now compute the likelihood of pₐ(y|ϕ). It is desirable to have the auxiliary likelihood as close to the true likelihood as possible. 
+To summarize the method, first we have the parameter vector θ and the observed data y. We would like to calculate the likelihood of ℓ(θ|y), but it is intractable or costly to compute. In this case, with pdBIL we have to find an auxiliary model (A) that we use to approximate the true likelihood in the following way: 
+* First we have to generate points, denote with **x\*** from the data generating process with the previously proposed parameters θ. 
+* Then we compute the MLE of the auxiliary likelihood under **x** to get the parameters denoted by ϕ. \
+ϕ(x⋆) = argmax₋ϕ (x⋆|ϕ) 
+
+* Under these parameters ϕ, we can now compute the likelihood of ℓₐ(y|ϕ). It is desirable to have the auxiliary likelihood as close to the true likelihood as possible. 
 
 # First stage of my project
 
-In the first stage of my project I coded two models from Drovandi et al. using pdBIL. After calculating the likelihood of the auxiliary model, I used a Random Walk Metropolis-Hastings MCMC to sample from the target distribution [Toy models](https://github.com/tpapp/HamiltonianABC.jl/tree/dorisz-toy-models). In this stage of the project, the methods I used were well-known.
-The purpose of the replication of the toy models from Drovandi et al. was to find out what issues we might face later and to come up with a usable interface. 
+In the first stage of my project I coded two models from Drovandi et al. using pdBIL. After calculating the likelihood of the auxiliary model, I used a Random Walk Metropolis-Hastings MCMC to sample from the target distribution, resulting in [Toy models](https://github.com/tpapp/HamiltonianABC.jl/tree/dorisz-toy-models). In this stage of the project, the methods I used were well-known.
+The purpose of the replication of the toy models from Drovandi et al. was to find out what issues we might face later on and to come up with a usable interface. 
 This stage resulted in [HamiltonianABC](https://github.com/tpapp/HamiltonianABC.jl/) (collaboration with Tamás K. Papp).
 
 # Second stage of my project
