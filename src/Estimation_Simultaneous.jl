@@ -36,4 +36,6 @@ sample_β = map_by_row(model.transformation, posterior)
 
 # save
 
-save(Simultaneous.path("results", "results.jld"), Dict("sample" => sample, "posterior" => posterior, "sample_β" => sample_β, "β" => β))
+mkpath(SimultaneousModel.path("results")) # ensure directory exists
+save(SimultaneousModel.path("results", "simultaneous_results.jld"),
+     Dict("sample" => sample, "posterior" => posterior, "sample_β" => sample_β, "β" => β))

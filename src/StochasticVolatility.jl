@@ -134,6 +134,6 @@ end
 `parts...` appended to the directory containing `src/` etc. Useful for saving graphs and data.
 
 """
-path(parts...) = normpath(joinpath(splitdir(Base.find_in_path("StochasticVolatility"))[1], "..", parts...))
+path(parts...) = normpath(joinpath(@__DIR__, "..", parts...))
 
 end

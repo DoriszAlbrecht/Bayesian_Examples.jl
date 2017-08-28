@@ -108,7 +108,6 @@ end
 
 """
 
-path(parts...) = normpath(joinpath(splitdir(Base.find_in_path("Simultaneous"))[1], "..", parts...))
-
+path(parts...) = normpath(joinpath(@__DIR__, "..", parts...))
 
 end
