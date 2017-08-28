@@ -88,7 +88,7 @@ struct StochasticVolatility{T, Prior_ρ, Prior_σ, Ttrans}
 end
 
 ```
-After specifying the data generating function and a couple of facilitator and additional functions for the particular model (whole module can be found in src folder), we can define the (pp::Structure\_of\_Model, θ) function where the first term is the previously defined sturture, that is unpacked inside of the function, θ is the vector of parameters. 
+After specifying the data generating function and a couple of facilitator and additional functions for the particular model (whole module can be found in _src_ folder), we can define the (pp::Structure\_of\_Model, θ) function where the first term is the previously defined sturture, that is unpacked inside of the function, θ is the vector of parameters. 
 
 ```julia
 function (pp::StochasticVolatility)(θ)
@@ -120,8 +120,19 @@ Given the defined functions, we can now start the estimation and sampling proces
 
 
 ```julia
-const RNG = srand(UInt32[0x23ef614d, 0x8332e05c, 0x3c574111, 0x121aa2f4])
-sample, tuned_sampler = NUTS_tune_and_mcmc(RNG, pp, 1000; q = θ₀)
+RNG = Base.Random.GLOBAL_RNG
+# true parameters and observed data
+ρ = 0.8
+σ = 0.6
+y = simulate_stochastic(ρ, σ, 10000)
+# setting up the model
+model = StochasticVolatility(y, Uniform(-1, 1), InverseGamma(1, 1), 10000)
+# we start the estimation process from the true values
+θ₀ = inverse(model.transformation, (ρ, σ))
+# wrap for gradient calculations
+fgw = ForwardGradientWrapper(model, θ₀)
+# sampling
+sample, tuned_sampler = NUTS_tune_and_mcmc(RNG, fgw, 5000; q = θ₀)
 ```
 
 The following graphs show the results for the parameters:
@@ -130,6 +141,8 @@ The following graphs show the results for the parameters:
 
 
 ![sigma_plot](https://user-images.githubusercontent.com/26724827/29598635-0e84b9aa-8798-11e7-9218-bc62347407ae.png)
+
+Analysing the graphs above, we can tell that the posterior values are in rather close to the true values. Also worth mentioning that the priors do not affect the posterior values.
 
 # Problems that I have faced during GSOC
 
@@ -174,3 +187,9 @@ end
 
 
 # Future work
+
+* More involved models
+
+* Solving isolation in the three component normal mixture model
+
+* Updating shocks in every iteration
