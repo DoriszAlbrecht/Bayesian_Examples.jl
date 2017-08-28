@@ -37,4 +37,7 @@ sample_ρ, sample_σ = map_by_row(model.transformation, posterior)
 
 # save
 
-save(StochasticVolatility.path("results", "results.jld"), Dict("sample" => sample, "posterior" => posterior, "sample_ρ" => sample_ρ, "sample_σ" => sample_σ, "ρ" => ρ, "σ" => σ))
+mkpath(StochasticVolatilities.path("results")) # ensure directory exists
+save(StochasticVolatilities.path("results", "stochvol_results.jld"),
+     Dict("sample" => sample, "posterior" => posterior, "sample_ρ" => sample_ρ,
+          "sample_σ" => sample_σ, "ρ" => ρ, "σ" => σ))
