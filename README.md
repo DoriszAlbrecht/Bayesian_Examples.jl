@@ -59,7 +59,10 @@ function yX2(zs, K)
     lag(zs, 0, K), hcat(ones(eltype(zs), length(zs)-K), lag_matrix(zs, 1:K, K))
 end
 ```
+The AR(2) process of the first differences can be summarized by: 
+The second difference of a series y is not simply the difference between y and its lagged term by two periods, but it is the first difference of the first difference. The so called "change in the change" of y at time t. The second difference of  a discrete function can be interpreted as the second derivative of a continuous function, which is the "acceleration" of the function at a point in time t. In this model, we want to capture the "acceleration" of the logarithmic return.
 
+The AR(2) process of the original variables meant to capture the contribution of the 2 previous timepoints to the current point at time t. 
 
 I will now describe the required steps for the estimation of the parameters of interest in the stochastic volatility model with the Dynamic Hamiltonian Monte Carlo method. We need to import three functions from the DynamicHMC repository: _logdensity_, _loggradient_ and _length_. 
 
