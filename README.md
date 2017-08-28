@@ -1,12 +1,6 @@
 # Bayesian_Examples.jl
 Examples of my project for Google Summer of Code
 
-# Literature Overview
-  * Betancourt, M. (2017). A Conceptual Introduction to Hamiltonian Monte Carlo.
-  * Drovandi, C. C., Pettitt, A. N., & Lee, A. (2015). Bayesian indirect inference using a parametric auxiliary model. 
-  * Gallant, A. R. and McCulloch, R. E. (2009). On the Determination of General Scientific Models With Application to Asset Pricing
-  * Rayner, G. D. and MacGillivray, H. L. (2002). Numerical maximum likelihood estimation for the g-and-k and generalized g-and-h distributions. Stat. Comput. 12 57–75.
-
 # GSOC 2017 project: Bayesian estimation using Random Walk Metropolis-Hastings and Dynamic Hamiltonian Monte Carlo methods
 
 This summer I have had the opportunity to participate in the Google Summer of Code program. My project was in the Julia language and the main goal was to  with the purpose to use different methods to estimate models in order to improve efficiency. 
@@ -193,3 +187,9 @@ end
 * Solving isolation in the three component normal mixture model
 
 * Updating shocks in every iteration
+
+# References
+  * Betancourt, M. (2017). A Conceptual Introduction to Hamiltonian Monte Carlo.
+  * Drovandi, C. C., Pettitt, A. N., & Lee, A. (2015). Bayesian indirect inference using a parametric auxiliary model. 
+  * Gallant, A. R. and McCulloch, R. E. (2009). On the Determination of General Scientific Models With Application to Asset Pricing
+  * Rayner, G. D. and MacGillivray, H. L. (2002). Numerical maximum likelihood estimation for the g-and-k and generalized g-and-h distributions. Stat. Comput. 12 57–75.
