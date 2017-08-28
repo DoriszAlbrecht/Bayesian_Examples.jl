@@ -41,13 +41,16 @@ The novelty of this project was to find a way to fit every component together in
 
 # Stochastic Volatility model
 
+After the second stage, I coded economic models for the [DynamicHMC.jl](https://github.com/tpapp/DynamicHMC.jl). The Stochastic Volatility model is one of them. In the following section, I will go rigorously through of the set up. 
 
 The discrete-time version of the Ornstein-Ulenbeck Stochastic - volatility model:
 
     yₜ = xₜ + ϵₜ where ϵₜ ∼ χ²(1)
     xₜ = ρ * xₜ₋₁ + σ * νₜ  where νₜ ∼ N(0, 1)
+    
+The discrete-time version was used as the data-generating process. Where yₜ denotes the logarithm return, xₜ is the logarithm of variance, while ϵₜ and νₜ are unobserved noise terms.
 
-For the auxiliary model, we used two regressions. The first regression was an AR(2) process on the first differences, the second was also an AR(2) process on the original variables in order to capture the levels. I will go into more details with this model.
+For the auxiliary model, we used two regressions. The first regression was an AR(2) process on the first differences, the second was also an AR(2) process on the original variables in order to capture the levels. 
 
 
 I will now introduce the required steps for the estimation of the parameters of interest in the stochastic volatility model with the Dynamic Hamiltonian Monte Carlo method. We need to import three functions from the DynamicHMC repository: _logdensity_, _loggradient_ and _length_. 
