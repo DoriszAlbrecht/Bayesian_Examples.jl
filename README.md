@@ -1,9 +1,10 @@
 # Bayesian_Examples.jl
 Examples of my project for Google Summer of Code
 
-# GSOC 2017 project: Bayesian estimation using Random Walk Metropolis-Hastings and Dynamic Hamiltonian Monte Carlo methods
+# GSOC 2017 project: Hamiltonian Monte Carlo and pseudo-Bayesian Indirect Likelihood
 
-This summer I have had the opportunity to participate in the Google Summer of Code program. My project was in the Julia language and the main goal was to  with the purpose to use different methods to estimate models in order to improve efficiency. 
+This summer I have had the opportunity to participate in the Google Summer of Code program. My project was in the Julia language and the main goal was to implement Indirect Inference (A. A. Smith 1993; A. Smith 2008) to overcome the typically arising issues (such as intractable or costly to compute likelihoods) when estimating models using likelihood-based methods. Using Hamiltonian Monte Carlo it was expected to get a more efficient sampling process.
+ 
 
 Under the mentorship of Tamás K. Papp, I completed a major revision of Bayesian estimation methods using Indirect Inference (II) and Hamiltonian Monte Carlo. I also got familiar with using git, opening issues, creating a repository among others. 
 
@@ -11,7 +12,7 @@ Hopefully, by the end of this post, I will manage to introduce these methods a l
 
 # Parametric Bayesian Indirect Likelihood for the Full Data
 
-Usually when we face an intractable likelihood or a likelihood that would be extremely costly to calculate, we have the option to use an alternative auxiliary model to extract and estimate the parameters of interest. These alternative models should be easier to deal with. Drovandi et al. revises a collection of parametric Bayesian Indirect Inference (pBII) methods, I focused on the parametric Bayesian Indirect Likelihood for the Full Data (pdBIL) method proposed by Gallant and McCulloch (2009). The pdBIL uses the likelihood of the auxiliary model as a substitute for the intractable likelihood. The pdBIL does not compare summary statistics, instead works in the following way: 
+Usually when we face an intractable likelihood or a likelihood that would be extremely costly to calculate, we have the option to use an alternative auxiliary model to extract and estimate the parameters of interest. These alternative models should be easier to deal with. Drovandi et al. reviews a collection of parametric Bayesian Indirect Inference (pBII) methods, I focused on the parametric Bayesian Indirect Likelihood for the Full Data (pdBIL) method proposed by Gallant and McCulloch (2009). The pdBIL uses the likelihood of the auxiliary model as a substitute for the intractable likelihood. The pdBIL does not compare summary statistics, instead works in the following way: 
 
 First the data is generated, once we have the data, we can estimate the parameters of the auxiliary model. Then, the estimated parameters are put into the auxiliary likelihood with the observed/generated data. Afterwards we can use this likelihood in our chosen Bayesian method i.e. MCMC. 
 
@@ -30,12 +31,12 @@ This stage resulted in [HamiltonianABC](https://github.com/tpapp/HamiltonianABC.
 
 # Second stage of my project
 
-After the first stage, I revised Betancourt (2017) and did a code revision for Tamás K. Papp's [DynamicHMC.jl](https://github.com/tpapp/DynamicHMC.jl) which consisted of checking the code and its comparison with the paper. In addition to using the Hamiltonian Monte Carlo method, the usage of the forward mode automatic differentiation of the ForwardDiff package was the other main factor of this stage.
-The novelty of this project was to find a way to fit every component together in a way to get an efficient estimation out of it.
+After the first stage, I worked through Betancourt (2017) and did a code revision for Tamás K. Papp's [DynamicHMC.jl](https://github.com/tpapp/DynamicHMC.jl) which consisted of checking the code and its comparison with the paper. In addition to using the Hamiltonian Monte Carlo method, the usage of the forward mode automatic differentiation of the ForwardDiff package was the other main factor of this stage.
+The novelty of this project was to find a way to fit every component together in a way to get an efficient estimation out of it. The biggest issue was to define type-stable functions such that to accelerate the sampling process.
 
 # Stochastic Volatility model
 
-After the second stage, I coded economic models for the [DynamicHMC.jl](https://github.com/tpapp/DynamicHMC.jl). The Stochastic Volatility model is one of them. In the following section, I will go rigorously through of the set up. 
+After the second stage, I coded economic models for the [DynamicHMC.jl](https://github.com/tpapp/DynamicHMC.jl). The Stochastic Volatility model is one of them. In the following section, I will go through of the set up. 
 
 The discrete-time version of the Ornstein-Ulenbeck Stochastic - volatility model:
 
@@ -45,6 +46,19 @@ The discrete-time version of the Ornstein-Ulenbeck Stochastic - volatility model
 The discrete-time version was used as the data-generating process. Where yₜ denotes the logarithm return, xₜ is the logarithm of variance, while ϵₜ and νₜ are unobserved noise terms.
 
 For the auxiliary model, we used two regressions. The first regression was an AR(2) process on the first differences, the second was also an AR(2) process on the original variables in order to capture the levels. 
+
+```julia
+"first auxiliary regression y, X, meant to capture first differences"
+function yX1(zs, K)
+    Δs = diff(zs)
+    lag(Δs, 0, K), hcat(lag_matrix(Δs, 1:K, K), ones(eltype(zs), length(Δs)-K), lag(zs, 1, K+1))
+end
+
+"second auxiliary regression y, X, meant to capture levels"
+function yX2(zs, K)
+    lag(zs, 0, K), hcat(ones(eltype(zs), length(zs)-K), lag_matrix(zs, 1:K, K))
+end
+```
 
 
 I will now describe the required steps for the estimation of the parameters of interest in the stochastic volatility model with the Dynamic Hamiltonian Monte Carlo method. We need to import three functions from the DynamicHMC repository: _logdensity_, _loggradient_ and _length_. 
