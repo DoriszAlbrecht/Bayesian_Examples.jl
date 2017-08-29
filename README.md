@@ -146,7 +146,7 @@ function (pp::StochasticVolatility)(θ)
     logprior + log_likelihood1 + log_likelihood2 + logjac(transformation, θ)
 end
 ```
-We need the transformations because the parameters are in the proper subset of ℝⁿ, but we want to use ℝⁿ. We use the ContinuousTransformation package for the transformations. We save the transformation such that the callable object stays type-stable which makes the process faster.
+We need the transformations because the parameters are in the proper subset of ℝⁿ, but we want to use ℝⁿ. The ContinuousTransformation package is used for the transformations. We save the transformations such that the callable object stays type-stable which makes the process faster.
 
 ν and ϵ are are random variables which we use after the transformation to simulate observation points. This way the simulated variables are continuous in the parameters and the posterior is differentiable. 
 
