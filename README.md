@@ -1,7 +1,7 @@
 # Bayesian_Examples.jl
-Examples of my project for Google Summer of Code
-
-In addition to this repository, I have collaborated in [HamiltonianABC](https://github.com/tpapp/HamiltonianABC.jl/) and its branches as part of the GSOC 2017.
+This is writeup of my project for the Google Summer of Code 2017. The
+associated repository contains examples of estimating various models. In
+addition to this repository, I have collaborated in [HamiltonianABC](https://github.com/tpapp/HamiltonianABC.jl/) and its branches as part of the GSOC 2017.
 
 # GSOC 2017 project: Hamiltonian Monte Carlo and pseudo-Bayesian Indirect Likelihood
 
@@ -10,7 +10,7 @@ This summer I have had the opportunity to participate in the Google Summer of Co
 
 Under the mentorship of Tamás K. Papp, I completed a major revision of Bayesian estimation methods using Indirect Inference (II) and Hamiltonian Monte Carlo. I also got familiar with using git, opening issues, creating a repository among others. 
 
-Hopefully, by the end of this post, I will manage to introduce these methods a little bit better and more extensively.
+Here I introduce the methods with a bit of context, and dicuss an example more extensively.
 
 # Parametric Bayesian Indirect Likelihood for the Full Data
 
@@ -23,7 +23,8 @@ To summarize the method, first we have the parameter vector θ and the observed 
 * Then we compute the MLE of the auxiliary likelihood under **x** to get the parameters denoted by ϕ. \
 ϕ(x⋆) = argmax₋ϕ (x⋆|ϕ) 
 
-* Under these parameters ϕ, we can now compute the likelihood of ℓₐ(y|ϕ). It is desirable to have the auxiliary likelihood as close to the true likelihood as possible. 
+* Under these parameters ϕ, we can now compute the likelihood of ℓₐ(y|ϕ). It is desirable to have the auxiliary likelihood as close to the true likelihood as possible, in the sense of capturing relevant aspects of the model and the
+generated data. 
 
 # First stage of my project
 
