@@ -3,7 +3,7 @@ Examples of my project for Google Summer of Code
 
 # GSOC 2017 project: Hamiltonian Monte Carlo and pseudo-Bayesian Indirect Likelihood
 
-This summer I have had the opportunity to participate in the Google Summer of Code program. My project was in the Julia language and the main goal was to implement Indirect Inference (A. A. Smith 1993; A. Smith 2008) to overcome the typically arising issues (such as intractable or costly to compute likelihoods) when estimating models using likelihood-based methods. Using Hamiltonian Monte Carlo it was expected to get a more efficient sampling process.
+This summer I have had the opportunity to participate in the Google Summer of Code program. My project was in the Julia language and the main goal was to implement Indirect Inference (A. A. Smith 1993; A. Smith 2008) to overcome the typically arising issues (such as intractable or costly to compute likelihoods) when estimating models using likelihood-based methods. Hamiltonian Monte Carlo was expected to result in a more efficient sampling process.
  
 
 Under the mentorship of Tamás K. Papp, I completed a major revision of Bayesian estimation methods using Indirect Inference (II) and Hamiltonian Monte Carlo. I also got familiar with using git, opening issues, creating a repository among others. 
@@ -43,7 +43,7 @@ The discrete-time version of the Ornstein-Ulenbeck Stochastic - volatility model
     yₜ = xₜ + ϵₜ where ϵₜ ∼ χ²(1)
     xₜ = ρ * xₜ₋₁ + σ * νₜ  where νₜ ∼ N(0, 1)
     
-The discrete-time version was used as the data-generating process. Where yₜ denotes the logarithm return, xₜ is the logarithm of variance, while ϵₜ and νₜ are unobserved noise terms.
+The discrete-time version was used as the data-generating process. Where yₜ denotes the logarithm of return, xₜ is the logarithm of variance, while ϵₜ and νₜ are unobserved noise terms.
 
 For the auxiliary model, we used two regressions. The first regression was an AR(2) process on the first differences, the second was also an AR(2) process on the original variables in order to capture the levels. 
 
@@ -59,8 +59,8 @@ function yX2(zs, K)
     lag(zs, 0, K), hcat(ones(eltype(zs), length(zs)-K), lag_matrix(zs, 1:K, K))
 end
 ```
-The AR(2) process of the first differences can be summarized by: 
-The second difference of a series y is not simply the difference between y and its lagged term by two periods, but it is the first difference of the first difference. The so called "change in the change" of y at time t. The second difference of  a discrete function can be interpreted as the second derivative of a continuous function, which is the "acceleration" of the function at a point in time t. In this model, we want to capture the "acceleration" of the logarithmic return.
+The AR(2) process of the first differences can be summarized by: \
+Given a series Y, it is the first difference of the first difference. The so called "change in the change" of Y at time t. The second difference of a discrete function can be interpreted as the second derivative of a continuous function, which is the "acceleration" of the function at a point in time t. In this model, we want to capture the "acceleration" of the logarithm of return.
 
 The AR(2) process of the original variables meant to capture the contribution of the 2 previous timepoints to the current point at time t. 
 
@@ -153,11 +153,11 @@ The following graphs show the results for the parameters:
 
 ![sigma_plot](https://user-images.githubusercontent.com/26724827/29598635-0e84b9aa-8798-11e7-9218-bc62347407ae.png)
 
-Analysing the graphs above, we can tell that the posterior values are in rather close to the true values. Also worth mentioning that the priors do not affect the posterior values.
+Analysing the graphs above, we can say that the posterior values are in rather close to the true values. Also worth mentioning that the priors do not affect the posterior values.
 
 # Problems that I have faced during GSOC
 
-1) Isolation.
+1) **Isolation**
 
   * The true model was the g-and-k quantile function described by Rayner and MacGillivray (2002). 
   * The auxiliary model was a three component normal mixture model. 
@@ -166,7 +166,7 @@ We faced serious problems with this model. \
 First of all, I coded the MLE of the finite component normal mixture model, which computes the means, variances and weights of the normals given the observed data and the desired number of mixtures. 
 With the g-and-k quantile function, I experienced the so called "isolation", which means that one observation point is an outlier getting weight 1, the other observed points get weigth 0, which results in variance equal to 0. There are ways to disentangle the problem of isolation, but the parameters of interests still did not converge to the true values. There is work to be done with this model.
 
-2) Type-stability issues.
+2) **Type-stability issues**
   
   To use the automatic differentiation method efficiently, I had to code the functions to be type-stable, otherwise the sampling functions would have taken hours to run. See the following example:
   
@@ -209,4 +209,7 @@ end
   * Betancourt, M. (2017). A Conceptual Introduction to Hamiltonian Monte Carlo.
   * Drovandi, C. C., Pettitt, A. N., & Lee, A. (2015). Bayesian indirect inference using a parametric auxiliary model. 
   * Gallant, A. R. and McCulloch, R. E. (2009). On the Determination of General Scientific Models With Application to Asset Pricing
-  * Rayner, G. D. and MacGillivray, H. L. (2002). Numerical maximum likelihood estimation for the g-and-k and generalized g-and-h distributions. Stat. Comput. 12 57–75.
+  * Rayner, G. D. and MacGillivray, H. L. (2002). Numerical maximum likelihood estimation for the g-and-k and generalized g-and-h distributions. In: Statistical Computation 12 57–75.
+  * Smith, A. A. (2008). “Indirect inference”. In: New Palgrave Dictionary of Economics, 2nd Edition (forthcoming).
+  * Smith, A. A. (1993). “Estimating nonlinear time-series models using simulated vector autoregressions”. In:
+Journal of Applied Econometrics 8.S1.
