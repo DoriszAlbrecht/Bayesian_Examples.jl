@@ -80,8 +80,6 @@ function Simultaneous(Cs, Ys, prior_β, dist_x, dist_us, M)
                  dist_us, transformation)
 end
 
-
-
 ## logdensity uses the following auxiliary model:
 ## Cₜ ∼  N(β₁ + β₂ * Xₜ, √σ²)
 
@@ -97,7 +95,7 @@ function (pp::Simultaneous)(θ)
     est = qrfact(XX, Val{true}) \ C
     σ² =  mean(abs2,  C - XX*est)
     log_likelihood = sum(logpdf.(Normal(0, √σ²), Cs - [ones(length(Cs)) Ys-Cs] * est))
-    return(logprior + log_likelihood + logjac(transformation, θ)) 
+    return(logprior + log_likelihood + logjac(transformation, θ))
 end
 
 

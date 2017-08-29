@@ -5,7 +5,6 @@ include(Pkg.dir("Bayesian_Examples", "src", "Simultaneous.jl"))
 using SimultaneousModel
 using Distributions
 import Distributions: Uniform
-
 using JLD
 
 RNG = Base.Random.GLOBAL_RNG
@@ -13,7 +12,7 @@ RNG = Base.Random.GLOBAL_RNG
 β = 0.9
 C, Y = simulate_simultaneous(β, rand(Normal(100, 3), 100), rand(Normal(0, 5), 100))
 
-# set up the model
+# setting up the model
 model = Simultaneous(C, Y, Uniform(0, 1), Normal(100, 3), Normal(0, 5), 1000)
 
 # we start the estimation process from the true values

@@ -13,7 +13,7 @@ RNG = Base.Random.GLOBAL_RNG
 σ = 0.6
 y = simulate_stochastic(ρ, σ, 10000)
 
-# set up the model
+# setting up the model
 model = StochasticVolatility(y, Uniform(-1, 1), InverseGamma(1, 1), 10000)
 
 # we start the estimation process from the true values

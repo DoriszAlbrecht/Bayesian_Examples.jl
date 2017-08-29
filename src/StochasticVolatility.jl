@@ -103,7 +103,6 @@ function StochasticVolatility(ys, prior_ρ, prior_σ, M)
     StochasticVolatility(ys, prior_ρ, prior_σ, rand(Chisq(1), M), randn(M), transformation)
 end
 
-
 function (pp::StochasticVolatility)(θ)
     @unpack ys, prior_ρ, prior_σ, ν, ϵ, transformation = pp
     ρ, σ = transformation(θ)
