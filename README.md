@@ -1,7 +1,7 @@
 # Bayesian_Examples.jl
 Examples of my project for Google Summer of Code
 
-In addition to this repository, I have collaborated in [HamiltonianABC](https://github.com/tpapp/HamiltonianABC.jl/) and its branches as part of the GSOC.
+In addition to this repository, I have collaborated in [HamiltonianABC](https://github.com/tpapp/HamiltonianABC.jl/) and its branches as part of the GSOC 2017.
 
 # GSOC 2017 project: Hamiltonian Monte Carlo and pseudo-Bayesian Indirect Likelihood
 
