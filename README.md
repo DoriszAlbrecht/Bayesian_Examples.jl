@@ -39,7 +39,7 @@ The novelty of this project was to find a way to fit every component together in
 
 # Stochastic Volatility model
 
-After the second stage, I coded economic models for the [DynamicHMC.jl](https://github.com/tpapp/DynamicHMC.jl). The Stochastic Volatility model is one of them. In the following section, I will go through of the set up. 
+After the second stage, I coded economic models for the [DynamicHMC.jl](https://github.com/tpapp/DynamicHMC.jl). The Stochastic Volatility model is one of them. In the following section, I will go through the set up. 
 
 The discrete-time version of the Ornstein-Ulenbeck Stochastic - volatility model:
 
@@ -51,6 +51,19 @@ The discrete-time version was used as the data-generating process. Where yₜ de
 For the auxiliary model, we used two regressions. The first regression was an AR(2) process on the first differences, the second was also an AR(2) process on the original variables in order to capture the levels. 
 
 ```julia
+"""
+    lag_matrix(xs, ns, K = maximum(ns))
+
+Matrix with differently lagged xs.
+"""
+function lag_matrix(xs, ns, K = maximum(ns))
+    M = Matrix{eltype(xs)}(length(xs)-K, maximum(ns))
+    for i ∈ ns
+        M[:, i] = lag(xs, i, K)
+    end
+    M
+end
+
 "first auxiliary regression y, X, meant to capture first differences"
 function yX1(zs, K)
     Δs = diff(zs)
@@ -65,9 +78,10 @@ end
 The AR(2) process of the first differences can be summarized by: \
 Given a series Y, it is the first difference of the first difference. The so called "change in the change" of Y at time t. The second difference of a discrete function can be interpreted as the second derivative of a continuous function, which is the "acceleration" of the function at a point in time t. In this model, we want to capture the "acceleration" of the logarithm of return.
 
-The AR(2) process of the original variables meant to capture the contribution of the 2 previous timepoints to the current point at time t. 
+The AR(2) process of the original variables is needed to capture the effect of ρ. It turned out that the impact of ρ was rather weak in the AR(2) process of the first differences . That is why we need a second auxiliary model.
 
-I will now describe the required steps for the estimation of the parameters of interest in the stochastic volatility model with the Dynamic Hamiltonian Monte Carlo method. We need to import three functions from the DynamicHMC repository: _logdensity_, _loggradient_ and _length_. 
+
+I will now describe the required steps for the estimation of the parameters of interest in the stochastic volatility model with the Dynamic Hamiltonian Monte Carlo method. First we need a callable Julia object which gives gives back the logdensity and the gradient in DiffResult. After that, we write a function that computes the density, then we calculate its gradient using the ForwardDiff package in a wrapper function.
 
 Required packages for the StochasticVolatility model:
 ```julia
@@ -83,7 +97,7 @@ using DiffWrappers
 import Distributions: Uniform, InverseGamma
 ```
 
-* First we need to define a structure, which we will use in every imported function. This structure should contain the observed data, the priors, the shocks and the transformation performed on the parameters, but the components may vary depending on the estimated model. 
+* First, we define a structure. This structure should contain the observed data, the priors, the shocks and the transformation performed on the parameters, but the components may vary depending on the estimated model. 
 
 ```julia
 struct StochasticVolatility{T, Prior_ρ, Prior_σ, Ttrans}
@@ -102,7 +116,8 @@ struct StochasticVolatility{T, Prior_ρ, Prior_σ, Ttrans}
 end
 
 ```
-After specifying the data generating function and a couple of facilitator and additional functions for the particular model (whole module can be found in _src_ folder), we can define the (pp::Structure\_of\_Model, θ) function where the first term is the previously defined sturture, that is unpacked inside of the function, θ is the vector of parameters. 
+After specifying the data generating function and a couple of facilitator and additional functions for the particular model (whole module can be found in _src_ folder), we can make the model structure callable, returning the log density. The logjac is needed because of the transformation we make on the parameters.
+ 
 
 ```julia
 function (pp::StochasticVolatility)(θ)
@@ -128,7 +143,9 @@ function (pp::StochasticVolatility)(θ)
     logprior + log_likelihood1 + log_likelihood2 + logjac(transformation, θ)
 end
 ```
+We need the transformations because the parameters are in the proper subset of ℝⁿ, but we want to use ℝⁿ. We use the ContinuousTransformation package for the transformations. We save the transformation such that the callable object stays type-stable which makes the process faster.
 
+ν and ϵ are are random variables which we use after the transformation to simulate observation points. This way the simulated variables are continuous in the parameters and the posterior is differentiable. 
 
 Given the defined functions, we can now start the estimation and sampling process:
 
