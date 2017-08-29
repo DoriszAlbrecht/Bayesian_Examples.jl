@@ -1,6 +1,8 @@
 # Bayesian_Examples.jl
 Examples of my project for Google Summer of Code
 
+In addition to this repository, I have collaborated in [HamiltonianABC](https://github.com/tpapp/HamiltonianABC.jl/) and its branches.
+
 # GSOC 2017 project: Hamiltonian Monte Carlo and pseudo-Bayesian Indirect Likelihood
 
 This summer I have had the opportunity to participate in the Google Summer of Code program. My project was in the Julia language and the main goal was to implement Indirect Inference (A. A. Smith 1993; A. Smith 2008) to overcome the typically arising issues (such as intractable or costly to compute likelihoods) when estimating models using likelihood-based methods. Hamiltonian Monte Carlo was expected to result in a more efficient sampling process.
