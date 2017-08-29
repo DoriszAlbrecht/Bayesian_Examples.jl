@@ -1,5 +1,5 @@
 # Bayesian_Examples.jl
-This is writeup of my project for the Google Summer of Code 2017. The
+This is a writeup of my project for the Google Summer of Code 2017. The
 associated repository contains examples of estimating various models. In
 addition to this repository, I have collaborated in [HamiltonianABC](https://github.com/tpapp/HamiltonianABC.jl/) and its branches as part of the GSOC 2017.
 
@@ -41,12 +41,15 @@ The novelty of this project was to find a way to fit every component together in
 
 After the second stage, I coded economic models for the [DynamicHMC.jl](https://github.com/tpapp/DynamicHMC.jl). The Stochastic Volatility model is one of them. In the following section, I will go through the set up. 
 
+The continuous-time version of the Ornstein-Ulenbeck Stochastic - volatiltiy model describes how the return at time t has mean zero and its volatility is governed by a continuous-time Ornstein-Ulenbeck process of its variance. The big fluctuation of the value of a financial product imply a varying volatility process. That is why we need stochastic elements in the model. As we can access data only in discrete time, it is natural to take the discretization of the model.
+
 The discrete-time version of the Ornstein-Ulenbeck Stochastic - volatility model:
 
     yₜ = xₜ + ϵₜ where ϵₜ ∼ χ²(1)
     xₜ = ρ * xₜ₋₁ + σ * νₜ  where νₜ ∼ N(0, 1)
     
 The discrete-time version was used as the data-generating process. Where yₜ denotes the logarithm of return, xₜ is the logarithm of variance, while ϵₜ and νₜ are unobserved noise terms.
+
 
 For the auxiliary model, we used two regressions. The first regression was an AR(2) process on the first differences, the second was also an AR(2) process on the original variables in order to capture the levels. 
 
@@ -81,7 +84,7 @@ Given a series Y, it is the first difference of the first difference. The so cal
 The AR(2) process of the original variables is needed to capture the effect of ρ. It turned out that the impact of ρ was rather weak in the AR(2) process of the first differences . That is why we need a second auxiliary model.
 
 
-I will now describe the required steps for the estimation of the parameters of interest in the stochastic volatility model with the Dynamic Hamiltonian Monte Carlo method. First we need a callable Julia object which gives gives back the logdensity and the gradient in DiffResult. After that, we write a function that computes the density, then we calculate its gradient using the ForwardDiff package in a wrapper function.
+I will now describe the required steps for the estimation of the parameters of interest in the stochastic volatility model with the Dynamic Hamiltonian Monte Carlo method. First we need a callable Julia object which gives back the logdensity and the gradient in DiffResult type. After that, we write a function that computes the density, then we calculate its gradient using the ForwardDiff package in a wrapper function.
 
 Required packages for the StochasticVolatility model:
 ```julia
@@ -177,7 +180,7 @@ Analysing the graphs above, we can say that the posterior values are in rather c
 
 # Problems that I have faced during GSOC
 
-1) **Isolation**
+1) **Difficult auxiliary model**
 
   * The true model was the g-and-k quantile function described by Rayner and MacGillivray (2002). 
   * The auxiliary model was a three component normal mixture model. 
@@ -225,10 +228,13 @@ end
 
 * Updating shocks in every iteration
 
+* Optimization
+
 # References
   * Betancourt, M. (2017). A Conceptual Introduction to Hamiltonian Monte Carlo.
   * Drovandi, C. C., Pettitt, A. N., & Lee, A. (2015). Bayesian indirect inference using a parametric auxiliary model. 
   * Gallant, A. R. and McCulloch, R. E. (2009). On the Determination of General Scientific Models With Application to Asset Pricing
+  * Martin, G. M., McCabe, B. P. M., Frazier, D. T., Maneesoonthorn, W. and Robert, C. P. (2016). Auxiliary Likelihood-Based Approximate Bayesian Computation in State Space Models
   * Rayner, G. D. and MacGillivray, H. L. (2002). Numerical maximum likelihood estimation for the g-and-k and generalized g-and-h distributions. In: Statistical Computation 12 57–75.
   * Smith, A. A. (2008). “Indirect inference”. In: New Palgrave Dictionary of Economics, 2nd Edition (forthcoming).
   * Smith, A. A. (1993). “Estimating nonlinear time-series models using simulated vector autoregressions”. In:
